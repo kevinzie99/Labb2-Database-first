@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Music;
+namespace Music.Model;
 
 public partial class Album
 {

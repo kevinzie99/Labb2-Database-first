@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Music;
+namespace Music.Model;
 
-public partial class Genre
+public partial class MediaType
 {
-    public int GenreId { get; set; }
+    public int MediaTypeId { get; set; }
 
     public string? Name { get; set; }
 
