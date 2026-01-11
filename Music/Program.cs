@@ -1,12 +1,12 @@
 ﻿
 
+using Microsoft.EntityFrameworkCore;
 using Music.Model;
 
 using var db = new MusicContext();
 
-bool gameIsRunning = true;
 
-while (gameIsRunning)
+while (true)
 {
 
     Console.WriteLine("=== Music App ===");
@@ -17,12 +17,36 @@ while (gameIsRunning)
     Console.WriteLine("0. Avsluta");
 
     string choice = Console.ReadLine();
-    int answer = Int32.Parse(choice);
+    if (!int.TryParse(choice, out int answer))
+    {
+        Console.WriteLine("Skriv ett giltigt nummer!");
+        continue; 
+    }
 
     switch (answer)
     {
         case 1:
-            
+
+            var playlists = db.Playlists.ToList();
+
+            foreach (var playlist in playlists)
+            {
+                Console.WriteLine($"\nPlaylist: {playlist.Name}");
+
+                var tracks = db.PlaylistTracks
+                    .Where(pt => pt.PlaylistId == playlist.PlaylistId)
+                    .Select(pt => pt.Track.Name)
+                    .ToList();
+
+                foreach (var trackName in tracks)
+                {
+                    Console.WriteLine($"  - {trackName}");
+                }
+                
+                Console.WriteLine("\nTryck på valfri tangent för att se nästa spellista");
+                Console.ReadKey();
+            }
+
             break;
 
         case 2:
