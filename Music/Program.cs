@@ -185,14 +185,82 @@ while (true)
                 Console.WriteLine("Spellistans namn uppdaterad!");
             }
 
+            var currentTracks = db.PlaylistTracks.Where(pt => pt.PlaylistId == playlistToEdit.PlaylistId).Include(pt => pt.Track).ToList();
+
+            Console.WriteLine("\nNuvarande låtar i spellistan:");
+
+            if (!currentTracks.Any())
+            {
+                Console.WriteLine("Inga låtar.");
+            }
+            else
+            {
+                foreach (var pt in currentTracks)
+                {
+                    Console.WriteLine($"ID: {pt.TrackId} - {pt.Track.Name}");
+                }
+            }
+
+            Console.WriteLine("\nVill du ta bort någon låt? (y/n)");
+            if (Console.ReadLine()?.ToLower() == "y")
+            {
+                Console.WriteLine("Skriv in Track ID på låten du vill ta bort (eller flera ID separerad med komma)");
+                string input = Console.ReadLine();
+
+                var idsToRemove = input.Split(',').Select(s => int.TryParse(s.Trim(), out int id) ? id : -1).Where(id => currentTracks.Any(pt => pt.TrackId == id)).ToList();
+
+                foreach (var id in idsToRemove)
+                {
+                    var ptRemove = currentTracks.First(pt => pt.TrackId == id);
+                    db.PlaylistTracks.Remove(ptRemove);
+                }
+                db.SaveChanges();
+                Console.WriteLine("Låtar borttagna.");
+            }
+
+            Console.WriteLine("\nVill du lägga till nya låtar? (y/n)");
+            if (Console.ReadLine()?.ToLower() == "y")
+            {
+                var anyTracks = db.Tracks.ToList();
+                foreach (var track in anyTracks)
+                {
+                    Console.WriteLine($"ID: {track.TrackId} - {track.Name}");
+                }
+
+                Console.WriteLine("\nSkriv in Track ID på låten du vill lägga till (eller flera ID separerad med komma):");
+                string addInput = Console.ReadLine();
+                var idsToAdd = addInput.Split(',')
+                    .Select(s => int.TryParse(s.Trim(), out int id) ? id : -1)
+                    .Where(id => anyTracks.Any(t => t.TrackId == id))
+                    .ToList();
+
+                foreach (var id in idsToAdd)
+                {
+                    var ptAdd = new PlaylistTrack
+                    {
+                        PlaylistId = playlistToEdit.PlaylistId,
+                        TrackId = id
+                    };
+                    db.PlaylistTracks.Add(ptAdd);
+                }
+                db.SaveChanges();
+                Console.WriteLine("\nLåtar tillagda.");
+            }
+
+            Console.WriteLine("Tryck på valfri tagent för att återgå till menyn...");
+            Console.ReadKey();
+
             break;
-        
+
+
+
+
         case 4:
-        break;
+                    break;
 
-        case 0:
-         return;
-                
+                case 0:
+                    return;
 
-    }
+
+                }
 }
