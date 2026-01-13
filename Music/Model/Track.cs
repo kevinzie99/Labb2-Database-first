@@ -28,4 +28,7 @@ public partial class Track
     public virtual Genre? Genre { get; set; }
 
     public virtual MediaType MediaType { get; set; } = null!;
+
+    public virtual ICollection<PlaylistTrack> PlaylistTracks { get; set; } = new List<PlaylistTrack>();
+
 }

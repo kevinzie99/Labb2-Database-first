@@ -32,6 +32,8 @@ public partial class MusicContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Data Source=localhost;Database=everyloop;Integrated Security=True;TrustServerCertificate=True;");
 
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Album>(entity =>
@@ -81,20 +83,24 @@ public partial class MusicContext : DbContext
 
         modelBuilder.Entity<PlaylistTrack>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("playlist_track", "music");
+            // Definiera composite key: PlaylistId + TrackId
+            entity.HasKey(pt => new { pt.PlaylistId, pt.TrackId });
 
-            entity.HasOne(d => d.Playlist).WithMany()
+            entity.ToTable("playlist_track", "music");
+
+            entity.HasOne(d => d.Playlist)
+                .WithMany(p => p.PlaylistTracks) // navigeringsproperty i Playlist
                 .HasForeignKey(d => d.PlaylistId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_playlist_track_playlists");
 
-            entity.HasOne(d => d.Track).WithMany()
+            entity.HasOne(d => d.Track)
+                .WithMany(t => t.PlaylistTracks) // navigeringsproperty i Track
                 .HasForeignKey(d => d.TrackId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_playlist_track_tracks");
         });
+
 
         modelBuilder.Entity<Track>(entity =>
         {
@@ -122,4 +128,6 @@ public partial class MusicContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+   
 }
