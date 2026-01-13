@@ -83,19 +83,19 @@ public partial class MusicContext : DbContext
 
         modelBuilder.Entity<PlaylistTrack>(entity =>
         {
-            // Definiera composite key: PlaylistId + TrackId
+           
             entity.HasKey(pt => new { pt.PlaylistId, pt.TrackId });
 
             entity.ToTable("playlist_track", "music");
 
             entity.HasOne(d => d.Playlist)
-                .WithMany(p => p.PlaylistTracks) // navigeringsproperty i Playlist
+                .WithMany(p => p.PlaylistTracks) 
                 .HasForeignKey(d => d.PlaylistId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_playlist_track_playlists");
 
             entity.HasOne(d => d.Track)
-                .WithMany(t => t.PlaylistTracks) // navigeringsproperty i Track
+                .WithMany(t => t.PlaylistTracks) 
                 .HasForeignKey(d => d.TrackId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_playlist_track_tracks");

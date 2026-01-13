@@ -21,7 +21,7 @@ while (true)
     if (!int.TryParse(choice, out int answer))
     {
         Console.WriteLine("Skriv ett giltigt nummer!");
-        continue; 
+        continue;
     }
 
     switch (answer)
@@ -43,7 +43,7 @@ while (true)
                 {
                     Console.WriteLine($"  - {trackName}");
                 }
-                
+
                 Console.WriteLine("\nTryck på valfri tangent för att se nästa spellista");
                 Console.ReadKey();
             }
@@ -68,12 +68,12 @@ while (true)
 
             }
 
-        
+
             int nextId = db.Playlists.Any() ? db.Playlists.Max(p => p.PlaylistId) + 1 : 1;
 
             var newPlaylist = new Playlist
             {
-                PlaylistId = nextId, 
+                PlaylistId = nextId,
                 Name = playlistName
             };
 
@@ -90,8 +90,8 @@ while (true)
             }
 
             Console.WriteLine("\nAlla låtar visas ovanför. Det är valfritt att söka på en låt.");
-         
-            
+
+
             while (true)
             {
                 Console.WriteLine("\nSök på låt (eller tryck Enter för att avsluta):");
@@ -133,7 +133,7 @@ while (true)
                 }
 
                 db.SaveChanges();
-                Console.WriteLine("Låtarna tillagda! Du kan fortsätta söka på låtar eller trycka Enter för avsluta");
+                Console.WriteLine("\nLåtarna tillagda! Du kan fortsätta söka på låtar eller trycka Enter för avsluta");
             }
 
             Console.WriteLine("Spellistan är klar!");
@@ -144,12 +144,55 @@ while (true)
 
 
         case 3:
-            break;
 
-        case 4:
+            var playlistsToEdit = db.Playlists.ToList();
+
+            if (!playlistsToEdit.Any())
+            {
+
+                Console.WriteLine("Inga spellistor finns att ändra");
+                break;
+            }
+
+            Console.WriteLine("\nSpellistor:");
+            foreach (var p in playlistsToEdit)
+            {
+                Console.WriteLine($"ID: {p.PlaylistId} - Name: {p.Name}");
+            }
+
+            Console.WriteLine("\nAnge ID på spellistan du vill ändra:");
+            if (!int.TryParse(Console.ReadLine(), out int editId))
+            {
+                Console.WriteLine("Ogiltigt ID.");
+                break;
+            }
+
+            var playlistToEdit = db.Playlists.FirstOrDefault(p => p.PlaylistId == editId);
+            if (playlistToEdit == null)
+            {
+                Console.WriteLine("Spellistan hittades inte.");
+                break;
+            }
+
+            Console.WriteLine($"\nNuvarande namn: {playlistToEdit.Name}");
+            Console.WriteLine("ange nytt namn på spellistan (lämna tomt för att behålla)");
+            string newName = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                playlistToEdit.Name = newName;
+                db.SaveChanges();
+                Console.WriteLine("Spellistans namn uppdaterad!");
+            }
+
             break;
+        
+        case 4:
+        break;
 
         case 0:
-            return;
+         return;
+                
+
     }
 }
