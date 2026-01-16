@@ -269,26 +269,41 @@ while (true)
                 Console.WriteLine($"ID: {p.PlaylistId} - Namn: {p.Name}");
             }
 
-            Console.WriteLine("\nAnge ID på spellistan du vill ta bort");
-            if (!int.TryParse(Console.ReadLine(), out int deleteId))
+            Console.WriteLine("Skriv ID på spellista att ta bort (eller separerade med komma):");
+            string inputDelete = Console.ReadLine();
+
+            string[] idParts = inputDelete.Split(',');
+
+            foreach (string part in idParts)
             {
-                Console.WriteLine("Ogiltigt ID.");
-                break;
+                if (!int.TryParse(part.Trim(), out int deleteId))
+                {
+                    Console.WriteLine($"Ogiltigt ID: {part}");
+                    continue;
+                }
+
+                var playlist = db.Playlists
+                    .FirstOrDefault(p => p.PlaylistId == deleteId);
+
+                if (playlist == null)
+                {
+                    Console.WriteLine($"Playlist med ID {deleteId} hittades inte.");
+                    continue;
+                }
+
+                // Ta bort kopplingar först
+                var playlistTracks = db.PlaylistTracks
+                    .Where(pt => pt.PlaylistId == deleteId)
+                    .ToList();
+
+                db.PlaylistTracks.RemoveRange(playlistTracks);
+
+                // Ta bort playlist
+                db.Playlists.Remove(playlist);
+
+                Console.WriteLine($"Playlist {playlist.Name} borttagen.");
             }
 
-            var playlistToDelete = db.Playlists.FirstOrDefault(p => p.PlaylistId == deleteId);
-
-            if (playlistToDelete == null)
-            {
-                Console.WriteLine("Spellistan hittades inte.");
-                break;
-            }
-
-            var playlistTracksToRemove = db.PlaylistTracks.Where(pt => pt.PlaylistId == deleteId).ToList();
-
-            db.PlaylistTracks.RemoveRange(playlistTracksToRemove);
-
-            db.Playlists.Remove(playlistToDelete);
             db.SaveChanges();
 
             Console.WriteLine("Spellistan har tagits bort!");
