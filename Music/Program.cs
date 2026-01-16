@@ -83,7 +83,7 @@ while (true)
 
             Console.WriteLine($"\nSpellistan {playlistName} är nu skapad! Nu kan du lägga till låtar.\n");
 
-            var allTracks = db.Tracks.ToList();
+            var allTracks  = db.Tracks.ToList();
             foreach (var track in allTracks)
             {
                 Console.WriteLine($"ID: {track.TrackId} - {track.Name}");
@@ -157,7 +157,7 @@ while (true)
             Console.WriteLine("\nSpellistor:");
             foreach (var p in playlistsToEdit)
             {
-                Console.WriteLine($"ID: {p.PlaylistId} - Name: {p.Name}");
+                Console.WriteLine($"ID: {p.PlaylistId} - Namn: {p.Name}");
             }
 
             Console.WriteLine("\nAnge ID på spellistan du vill ändra:");
@@ -175,7 +175,7 @@ while (true)
             }
 
             Console.WriteLine($"\nNuvarande namn: {playlistToEdit.Name}");
-            Console.WriteLine("ange nytt namn på spellistan (lämna tomt för att behålla)");
+            Console.WriteLine("Ange nytt namn på spellistan (lämna tomt för att behålla)");
             string newName = Console.ReadLine();
 
             if (!string.IsNullOrWhiteSpace(newName))
@@ -247,20 +247,61 @@ while (true)
                 Console.WriteLine("\nLåtar tillagda.");
             }
 
-            Console.WriteLine("Tryck på valfri tagent för att återgå till menyn...");
+            Console.WriteLine("\nTryck på valfri tagent för att återgå till menyn...");
             Console.ReadKey();
 
             break;
 
 
 
-
         case 4:
-                    break;
+            var playlistsToDelete = db.Playlists.ToList();
+            
+            if (playlistsToDelete.Count == 0)
+            {
+                Console.WriteLine("Inga spellistor att ta bort");
+                break;
+            }
 
-                case 0:
-                    return;
+            Console.WriteLine("\nSpellistor:");
+            foreach (var p in playlistsToDelete)
+            {
+                Console.WriteLine($"ID: {p.PlaylistId} - Namn: {p.Name}");
+            }
+
+            Console.WriteLine("\nAnge ID på spellistan du vill ta bort");
+            if (!int.TryParse(Console.ReadLine(), out int deleteId))
+            {
+                Console.WriteLine("Ogiltigt ID.");
+                break;
+            }
+
+            var playlistToDelete = db.Playlists.FirstOrDefault(p => p.PlaylistId == deleteId);
+
+            if (playlistToDelete == null)
+            {
+                Console.WriteLine("Spellistan hittades inte.");
+                break;
+            }
+
+            var playlistTracksToRemove = db.PlaylistTracks.Where(pt => pt.PlaylistId == deleteId).ToList();
+
+            db.PlaylistTracks.RemoveRange(playlistTracksToRemove);
+
+            db.Playlists.Remove(playlistToDelete);
+            db.SaveChanges();
+
+            Console.WriteLine("Spellistan har tagits bort!");
+
+            Console.WriteLine("\nTryck på valfri tagent för att återgå till menyn...");
+            Console.ReadKey();
+            break;
 
 
-                }
+        case 0:
+                   
+            return;
+
+
+    }
 }
