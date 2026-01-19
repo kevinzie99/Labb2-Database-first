@@ -291,14 +291,13 @@ while (true)
                     continue;
                 }
 
-                // Ta bort kopplingar först
+            
                 var playlistTracks = db.PlaylistTracks
                     .Where(pt => pt.PlaylistId == deleteId)
                     .ToList();
 
                 db.PlaylistTracks.RemoveRange(playlistTracks);
 
-                // Ta bort playlist
                 db.Playlists.Remove(playlist);
 
                 Console.WriteLine($"Playlist {playlist.Name} borttagen.");
